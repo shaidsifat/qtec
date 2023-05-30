@@ -1,0 +1,96 @@
+<!-- products/product_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product List</title>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Product List</h1>
+
+    <div class="row">
+      <div class="col-md-3">
+        <h2>Filters</h2>
+        <form id="filter-form">
+          <h4>Categories</h4>
+          {% for category in categories %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="category" value="{{ category.id }}">
+              <label class="form-check-label">{{ category.name }}</label>
+            </div>
+          {% endfor %}
+
+          <h4>Brands</h4>
+          {% for brand in brands %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.id }}">
+              <label class="form-check-label">{{ brand.name }}</label>
+            </div>
+          {% endfor %}
+
+          <h4>Warranties</h4>
+          {% for warranty in warranties %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="warranty" value="{{ warranty.id }}">
+              <label class="form-check-label">{{ warranty.name }}</label>
+            </div>
+          {% endfor %}
+
+          <h4>Sellers</h4>
+          {% for seller in sellers %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="seller" value="{{ seller.id }}">
+              <label class="form-check-label">{{ seller.name }}</label>
+            </div>
+          {% endfor %}
+
+          <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </form>
+      </div>
+
+      <div class="col-md-9">
+        <h2>Results</h2>
+        <ul>
+          {% for product in products %}
+            <li>{{ product.name }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#filter-form').submit(function(event) {
+        event.preventDefault();
+        applyFilters();
+      });
+
+      function applyFilters() {
+        var formData = $('#filter-form').serialize();
+
+        $.ajax({
+          type: 'GET',
+          url: '{% url "product_list" %}',
+          data: formData,
+          success: function(response) {
+            var productList = response.product_list;
+
+            var itemList = '';
+            for (var i = 0; i < productList.length; i++) {
+              itemList += '<li>' + productList[i].name + '</li>';
+            }
+
+            $('ul').html(itemList);
+          },
+          error: function(xhr, errmsg, err) {
+            console.log(xhr.status + ': ' + xhr.responseText);
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
